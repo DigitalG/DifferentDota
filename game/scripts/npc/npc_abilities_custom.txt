@@ -1,0 +1,181 @@
+
+// Dota Abilities Override File
+"DOTAAbilities"
+{
+    "Version"   "1"
+//Juggernaut-------------
+    "juggernaut_blade_fury"
+    {
+        "BaseClass"                     "ability_datadriven"
+        "AbilityTextureName"            "juggernaut_blade_fury"
+        "MaxLevel"                         "4"
+
+        "AbilityBehavior"                "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityUnitTargetTeam"            "DOTA_UNIT_TARGET_TEAM_ENEMY"
+        "AbilityUnitTargetType"            "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+        "AbilityUnitDamageType"            "DAMAGE_TYPE_PHYSICAL"
+
+        "AbilitySpecial"
+        {
+            "01"
+            {
+                "var_type"            "FIELD_INTEGER"
+                "radius"               "300"
+            }
+            "02"
+            {
+                "var_type"            "FIELD_FLOAT"
+                "damage_mod"        "30.0 42.0 54.0 66.0"
+            }
+        }
+
+        "Modifiers"
+        {
+            "modifier_blade_fury_self"
+            {
+                "Passive"            "1"
+                "IsHidden"            "1"
+                "IsDebuff"            "0"
+
+                "OnAttackLanded"
+                {
+                    "RunScript"
+                    {
+                        "ScriptFile"    "heroes/hero_juggernaut/blade_fury.lua"
+                        "Function"        "OnAttackLanded"
+                        "damage_dealt"     "%attack_damage"
+                    }
+                }
+            }
+        }
+
+    }
+
+//riki-----------------
+    "riki_smoke_screen"
+    {
+        // General
+        //-------------------------------------------------------------------------------------------------------------
+        "BaseClass"             "ability_datadriven"
+        "AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+        "AbilityTextureName"            "riki_smoke_screen"
+        "AOERadius"                     "%radius"
+
+        "AbilityUnitTargetTeam"            "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+        "AbilityUnitTargetType"            "DOTA_UNIT_TARGET_HERO"
+        "AbilityUnitDamageType"            "DAMAGE_TYPE_MAGICAL"
+
+        // Casting
+        //-------------------------------------------------------------------------------------------------------------
+        "AbilityCastPoint"              "0.4"
+        "AbilityCastRange"              "550"
+
+        // Time     
+        //-------------------------------------------------------------------------------------------------------------
+        "AbilityCooldown"               "6.0"
+        
+        // Cost
+        //-------------------------------------------------------------------------------------------------------------
+        "AbilityManaCost"               "90"
+        
+        // Special  
+        //-------------------------------------------------------------------------------------------------------------
+        "AbilitySpecial"
+        {
+            "01"
+            {
+                "var_type"              "FIELD_INTEGER"
+                "radius"                "250 275 300 325"
+            }
+            "02"
+            {
+                "var_type"              "FIELD_FLOAT"
+                "duration"              "6.0"
+            }
+            "02"
+            {
+                "var_type"              "FIELD_FLOAT"
+                "linger_duration"       "0.5"
+            }
+            "03"
+            {
+                "var_type"              "FIELD_INTEGER"
+                "cast_range_bonus"             "100 150 200 250"
+            }
+        }
+
+        "precache"
+        {
+            "soundfile" "sounds/weapons/hero/riki/riki_smokescreen.vsnd"
+            "particle"  "particles/units/heroes/hero_riki/riki_smokebomb.vpcf"
+            "particle"  "particles/units/heroes/hero_riki/riki_smokebomb_b.vpcf"
+        }
+
+        "OnSpellStart"
+        {
+            "CreateThinker"
+            {
+                "ModifierName"  "modifier_smoke_screen"
+                "Target"        "POINT"
+            }
+
+            "RunScript"
+            {
+                "ScriptFile"    "heroes/hero_riki/smoke_screen.lua"
+                "Function"        "OnSpellStart"
+            }
+        } 
+
+        "Modifiers"
+        {
+            "modifier_smoke_screen"
+            {
+                "RunScript"
+                {
+                    "ScriptFile"    "heroes/hero_riki/smoke_screen.lua"
+                    "Function"        "OnThink"
+                }
+                "Duration"              "%duration"
+
+                "OnCreated"
+                {
+                    "FireSound"
+                    {
+                        //fix sound!
+                        "EffectName"    "Hero_Riki.Smoke_Screen"
+                        "Target"        "CASTER"
+                    }
+
+                    "AttachEffect"
+                    {
+                        "EffectName"        "particles/units/heroes/hero_riki/riki_smokebomb.vpcf"
+                        "EffectAttachType"  "follow_origin"
+                        "Target"            "TARGET"
+                        "ControlPoints"
+                        {
+                            "00" "0 0 0"
+                            "01" "%radius %radius %radius"
+                        }
+                    }
+                }
+            }
+
+            "modifier_smoke_screen_buff"
+            {
+                "IsDebuff"      "1"
+
+                "Duration"          "%linger_duration"
+                
+                "Properties"
+                {
+                    "MODIFIER_PROPERTY_CAST_RANGE_BONUS"  "%cast_range_bonus"
+                }
+                "States"
+                {
+                    "MODIFIER_STATE_INVISIBLE"  "MODIFIER_STATE_VALUE_ENABLED" 
+                }
+            }
+        }
+    }
+}
+
